@@ -1,0 +1,1231 @@
+import sqlite3
+import asyncio
+import discord
+from discord.ext import commands
+import random
+import youtube_dl
+from discord.utils import get
+import os
+from discord_slash import SlashCommand
+from discord_slash.utils.manage_commands import create_option
+
+
+client = commands.Bot(command_prefix = ".", intents = discord.Intents.all())
+client.remove_command("help")
+guild_welcome = {906793314735489076}
+connection = sqlite3.connect('BetiiBot')
+cursor = connection.cursor()
+slash= SlashCommand(client, sync_commands=True)
+
+@client.event
+async def on_ready():
+    await client.change_presence(status = discord.Status.online, activity = discord.Game('.help'))
+    print('В библиотеке!')
+
+
+@client.command(name = "help")
+async def help(ctx):
+    embed =discord.Embed(title = 'Команды Бетти',
+                          color=0xff80ff)
+    embed.add_field(name = "Действия:",
+                    value = ".smile, .kiss,  .pout, .tease, .nuzzle, .hug, .wink, .sweeties, .bloodsuck, .p, .m, .complaint "
+                            ".blush, .cuddle, .kill, .feed, .kiss, .lewd, .baka, .steal, .bite, .cry, .sing, .play, .draw, .drink, .flower, .snowball, .sleep, .shout, .sad, .lazy, .run, .angry, .strocking, .massage, .think",
+                    inline = True)
+    embed.add_field(name = "Администратор:", value = ".ban, .kick, .mute, .clear, .create")
+    embed.add_field(name = "Музыка:", value = ".play, .leave")
+    embed.add_field(name = "Информация:", value = "help, .info, .server, .user, .avatar")
+    embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+@client.command(name='help Музыка',aliases=["helpМ"])
+async def helpМузыка(ctx):
+    embed=discord.Embed(title = 'Музыка', description = '***.join-***пригласить Betti в голосовой канал\n'
+                                                        '***.leave-***отключить Betti от голосового канала', color = 0xff80ff)
+    embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@client.command(name='help Действия',aliases=["helpД"])
+async def helpДействия(ctx):
+    embed = discord.Embed(title = 'Действия', description = f'***.smile-*** улыбнуться(пользователю)\n,'
+                                                            "***.kiss-*** поцеловать пользователя,\n"
+                                                            "***.pout-*** дутся(на пользователя),\n"
+                                                            "***.tease-*** дразнить пользователя,\n"
+                                                            "***.clap-***хлопать(пользователю)\n"
+                                                            "***.nuzzle-*** прижиматся к пользователю,\n"
+                                                            "***.hug-*** обнять пользователя,\n"
+                                                            "***.wink-*** подмигнуть пользователю, "
+                                                            "***.sweeties-*** назвать сладким пользователя,\n"
+                                                            " ***.bloodsuck-*** выпить кровь с пользователя, \n"
+                                                            " ***.blush-*** смущатся (пользователя),\n "
+                                                            "***.cuddle-*** затискать пользователя,\n"
+                                                            " ***.kill-*** закончить самоубийством/ убить пользователя, \n"
+                                                            "***.feed-*** покушать/кормить пользователя,\n "
+                                                            "***.lewd-*** назвать извращенцем пользователя,\n"
+                                                            " ***.baka-*** назвать бакай пользователя,\n"
+                                                            " ***.steal-*** обокрасть пользователя,\n"
+                                                            " ***.bite-*** укусить пользователя,\n "
+                                                            "***.cry-*** плакать(из-за пользователя),\n"
+                                                            " ***.sing-*** петь(для пользователя),\n "
+                                                            "***.playing-*** играть(с пользователем), \n"
+                                                            "***.draw-*** рисовать(пользователя),\n"
+                                                            " ***.drink-*** пить(с пользователем),\n "
+                                                            "***.flower-*** дарить цветы пользователю, \n"
+                                                            "***.snowball-***бросать снежку в пользователя,\n"
+                                                            " ***.sleep-*** спать(вместе с пользователем),\n"
+                                                            " ***.shout-*** кричать на пользователя, \n"
+                                                            "***.sad-*** грустить(из-за пользователя),\n "
+                                                            "***.lazy-*** ленится/назвать леньтяем пользователя,\n"
+                                                            " ***.run-*** бежать/убегать от пользователя,\n "
+                                                            "***.angry-*** злится(на пользователя),\n "
+                                                            "***.strocking-*** гладить пользователя,\n"
+                                                            " ***.massage-*** делать массаж пользователю,\n"
+                                                            " ***.think-*** думать(о пользователе)\n"
+                                                            "***.p-*** заполнить анкету на пиар-менеджера\n"
+                                                            "***.m-*** заполнить анкету на модератора\n"
+                                                            "***.complaint-*** подать жалобу на пользователя\n", color = 0xff80ff)
+    embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@client.command(name='help Администратор',aliases=["helpА"])
+async def helpАдминистратор(ctx):
+    embed = discord.Embed(title = 'Администратор(для тех кто имеет права администратора)',
+                          description = '***.ban-*** забанить пользователя,\n ***.kick-*** удалить пользователя с сервера,\n ***.mute-*** замутить пользователя(должна быть роль "mute"),\n ***.clear-*** очистить чат,\n ***.create-*** создать розыгрыш)',
+                          color = 0xff80ff)
+    embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@client.command(name='help Информация',aliases=["helpИ"])
+async def helpИнформация(ctx):
+    embed = discord.Embed(title = 'Информация',
+                          description = " ***.info-*** информация о боте,\n ***.server-*** информация о сервере,\n ***.user-*** информация о вас/пользователе,\n ***.avatar-*** аватар ваш/пользователя",
+                          color = 0xff80ff)
+    embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'smile', description = 'улыбнутся', options = [{"name": "member", "description": "пользователь", "type": 6, "required": False}], guild_ids = None)
+@client.command(name = "smile")
+async def smile(ctx, member: discord.Member = None):
+    if member is None:
+        items21 = ['https://c.tenor.com/nBWlYPbKxzwAAAAM/anime-happy.gif',
+                   'https://c.tenor.com/U1p83COiAPYAAAAM/anime-happy-anime-smile.gif',
+                   'https://c.tenor.com/B5mG_MXzno0AAAAM/anime-taiga-aisaka.gif',
+                   'https://c.tenor.com/Wzymbgijw7gAAAAM/anime-smile.gif',
+                   'https://c.tenor.com/DbRVEHMsm-YAAAAM/yoruka-smile-yoruka.gif',
+                   'https://c.tenor.com/KHrW6-V4HCoAAAAM/koushi-nagumo-shota.gif',
+                   'https://c.tenor.com/--PYOLkrn8EAAAAM/headpat-smile.gif',
+                   'https://c.tenor.com/PuX9_sU4VToAAAAM/daddy-little.gif',
+                   'https://c.tenor.com/GGdOX-9pLyAAAAAM/hyouka-smile.gif',
+                   'https://c.tenor.com/gIyto3eAkqYAAAAM/smile-%E9%82%AA%E7%A5%9E%E3%81%A1%E3%82%83%E3%82%93.gif',
+                   'https://c.tenor.com/oHn-l0vBtlkAAAAM/ngnl-no-game-no-life.gif']
+        embed = discord.Embed(title = f' {ctx.author.name}  улыбается  ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items21))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items20 = ['https://c.tenor.com/nBWlYPbKxzwAAAAM/anime-happy.gif',
+                   'https://c.tenor.com/U1p83COiAPYAAAAM/anime-happy-anime-smile.gif',
+                   'https://c.tenor.com/B5mG_MXzno0AAAAM/anime-taiga-aisaka.gif',
+                   'https://c.tenor.com/Wzymbgijw7gAAAAM/anime-smile.gif',
+                   'https://c.tenor.com/DbRVEHMsm-YAAAAM/yoruka-smile-yoruka.gif',
+                   'https://c.tenor.com/KHrW6-V4HCoAAAAM/koushi-nagumo-shota.gif',
+                   'https://c.tenor.com/--PYOLkrn8EAAAAM/headpat-smile.gif',
+                   'https://c.tenor.com/PuX9_sU4VToAAAAM/daddy-little.gif',
+                   'https://c.tenor.com/GGdOX-9pLyAAAAAM/hyouka-smile.gif',
+                   'https://c.tenor.com/gIyto3eAkqYAAAAM/smile-%E9%82%AA%E7%A5%9E%E3%81%A1%E3%82%83%E3%82%93.gif',
+                   'https://c.tenor.com/oHn-l0vBtlkAAAAM/ngnl-no-game-no-life.gif']
+        embed = discord.Embed(title = f' {ctx.author.name}  улибается {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items20))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'hug', description = 'обнять', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "hug")
+async def hug(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items19 = ['https://c.tenor.com/9e1aE_xBLCsAAAAM/anime-hug.gif',
+                   'https://c.tenor.com/Ct4bdr2ZGeAAAAAM/teria-wang-kishuku-gakkou-no-juliet.gif',
+                   'https://c.tenor.com/2bWwi8DhDsAAAAAM/hugs-and-love.gif',
+                   'https://c.tenor.com/jQ0FcfbsXqIAAAAM/hug-anime.gif',
+                   'https://c.tenor.com/nmzZIEFv8nkAAAAM/hug-anime.gif',
+                   'https://c.tenor.com/83QLplerW8sAAAAM/anime-hug.gif',
+                   'https://c.tenor.com/z6wApX13fSEAAAAM/abra%C3%A7o-hug.gif',
+                   'https://c.tenor.com/cFhjNVecNGcAAAAM/anime-hug.gif',
+                   'https://c.tenor.com/kP7ssdam30oAAAAM/love-hug.gif',
+                   'https://c.tenor.com/-0nQoPY5sZ0AAAAM/anime-hug-hug.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} обнимает {member.name}  ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items19))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'kiss', description = 'поцеловать', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "kiss")
+async def kiss(ctx, member: discord.Member = None):
+    global embed
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items18 = ['https://c.tenor.com/F02Ep3b2jJgAAAAM/cute-kawai.gif',
+                   'https://c.tenor.com/I8kWjuAtX-QAAAAM/anime-ano.gif',
+                   'https://c.tenor.com/03wlqWILqpEAAAAM/highschool-dxd-asia.gif',
+                   'https://c.tenor.com/V0nBQduEYb8AAAAM/anime-kiss-making-out.gif',
+                   'https://c.tenor.com/9vycr5sUYBMAAAAM/eden-of-the-east-anime.gif',
+                   'https://c.tenor.com/4ofp_xCUBxcAAAAM/eden-of-the-east-akira-takizawa.gif',
+                   'https://c.tenor.com/hK8IUmweJWAAAAAM/kiss-me-%D0%BB%D1%8E%D0%B1%D0%BB%D1%8E.gif',
+                   'https://c.tenor.com/HgV0doOr_YoAAAAM/golden-time-anime.gif',
+                   'https://c.tenor.com/BjwmxFVGKm0AAAAM/toloveru-unexpected.gif',
+                   'https://c.tenor.com/cllOx7dUv5oAAAAM/citrus.gif',
+                   'https://c.tenor.com/nRdyrvS3qa4AAAAM/anime-kiss.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} целует {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items18))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'pout', description = 'дутся', options = [{"name": "member", "description": "пользователь", "type": 6, "required": False}], guild_ids = None)
+@client.command(name = "pout")
+async def pout(ctx, member: discord.Member = None):
+    if member is None:
+        items17 = ['https://c.tenor.com/yCR6JOoxS6wAAAAM/anime-angry.gif',
+                   'https://c.tenor.com/hR8XdCeC2psAAAAM/cute-pouting.gif',
+                   'https://c.tenor.com/aIqMK6BzTcEAAAAM/anime-blob.gif',
+                   'https://c.tenor.com/c4TIM065PccAAAAM/pout-anime-pout.gif',
+                   'https://c.tenor.com/6FBpSeoDjX4AAAAM/anime-pout.gif',
+                   'https://c.tenor.com/-OQ4Aop9twQAAAAM/pout-anime.gif']
+        embed = discord.Embed(title = f' {ctx.author.name}  дуется  ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items17))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items16 = ['https://c.tenor.com/yCR6JOoxS6wAAAAM/anime-angry.gif',
+                   'https://c.tenor.com/hR8XdCeC2psAAAAM/cute-pouting.gif',
+                   'https://c.tenor.com/aIqMK6BzTcEAAAAM/anime-blob.gif',
+                   'https://c.tenor.com/c4TIM065PccAAAAM/pout-anime-pout.gif',
+                   'https://c.tenor.com/6FBpSeoDjX4AAAAM/anime-pout.gif',
+                   'https://c.tenor.com/-OQ4Aop9twQAAAAM/pout-anime.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} дуется на {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items16))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'blush', description = 'смущатся', options = [{"name": "member", "description": "пользователь", "type": 6, "required": False}], guild_ids = None)
+@client.command(name = "blush")
+async def blush(ctx, member: discord.Member = None):
+    if member is None:
+        items15 = ['https://c.tenor.com/wwxHnJqUNEMAAAAM/anime-blush.gif',
+                   'https://c.tenor.com/T51BLj_Cj8cAAAAM/blush.gif',
+                   'https://c.tenor.com/JhO1fYhvP14AAAAM/face-blush.gif',
+                   'https://c.tenor.com/OJ7dWLRs3JAAAAAM/mizuhara-chizuru.gif',
+                   'https://c.tenor.com/PYOlVtPLnwoAAAAM/the-quintessential-quintuplets.gif',
+                   'https://c.tenor.com/KKLSi3AgXuoAAAAM/anime-girl.gif',
+                   'https://c.tenor.com/bK3HaiUvszUAAAAM/kawaii-anime.gif']
+        embed = discord.Embed(title = f' {ctx.author.name}  смущается  ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items15))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items14 = ['https://c.tenor.com/wwxHnJqUNEMAAAAM/anime-blush.gif',
+                   'https://c.tenor.com/T51BLj_Cj8cAAAAM/blush.gif',
+                   'https://c.tenor.com/JhO1fYhvP14AAAAM/face-blush.gif',
+                   'https://c.tenor.com/OJ7dWLRs3JAAAAAM/mizuhara-chizuru.gif',
+                   'https://c.tenor.com/PYOlVtPLnwoAAAAM/the-quintessential-quintuplets.gif',
+                   'https://c.tenor.com/KKLSi3AgXuoAAAAM/anime-girl.gif',
+                   'https://c.tenor.com/bK3HaiUvszUAAAAM/kawaii-anime.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} смущается {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items14))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'kill', description = 'убить', options = [{"name": "member", "description": "пользователь", "type": 6, "required": False}], guild_ids = None)
+@client.command(name = "kill")
+async def kill(ctx, member: discord.Member = None):
+    if member is None:
+        items13 = ['https://c.tenor.com/9Ql_VyYvMZkAAAAM/anime-sleeping.gif',
+                   'https://c.tenor.com/_aMkVJcxClIAAAAM/yu-yu-hakusho-anime.gif',
+                   'https://c.tenor.com/zZ2NA1iyuIsAAAAM/noragami-yato.gif',
+                   'https://c.tenor.com/8Gu7ihnHlr8AAAAM/sailor-moon.gif',
+                   'https://c.tenor.com/hjnUROOP0WkAAAAM/falling-over.gif']
+        embed = discord.Embed(title = f' {ctx.author.name}  закончил(а) самоубийством ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items13))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items12 = ['https://c.tenor.com/Ce8ZMfAcjdoAAAAM/anime.gif',
+                   'https://c.tenor.com/t-0fYVPgg1YAAAAM/pink-hair-anime.gif',
+                   'https://c.tenor.com/Mn4W4D899WEAAAAM/ira-gamagoori-attack.gif',
+                   'https://c.tenor.com/pwPMerSJ-6gAAAAM/happy-sugar-life-%E3%83%8F%E3%83%83%E3%83%94%E3%83%BC%E3%82%B7%E3%83%A5%E3%82%AC%E3%83%BC%E3%83%A9%E3%82%A4%E3%83%95.gif',
+                   'https://c.tenor.com/1dtHuFICZF4AAAAM/kill-smack.gif',
+                   'https://c.tenor.com/blYwpMNaaCUAAAAM/nichijou-uppercut.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} убил(а) {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items12))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'nuzzle', description = 'прижатся', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "nuzzle")
+async def nuzzle(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items11 = ['https://c.tenor.com/wZQ82apr3YMAAAAM/anime-cuddle.gif',
+                   'https://c.tenor.com/knw-kp62PjoAAAAM/bffs-anime.gif',
+                   'https://c.tenor.com/ch1kq7TOxlkAAAAM/anime-cuddle.gif',
+                   'https://c.tenor.com/-QIbjtrBd64AAAAM/cuddle-anime.gif',
+                   'https://c.tenor.com/DlW1R4d1NQAAAAAM/anime-cuddle.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} прижимается к {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items11))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'wink', description = 'подмигнуть', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "wink")
+async def wink(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items10 = ['https://c.tenor.com/-5AUG9ixQZgAAAAM/anime-girl.gif',
+                   'https://c.tenor.com/hjSueWgAfasAAAAM/umaru-chan-wink.gif',
+                   'https://c.tenor.com/1XNTOsFJQY8AAAAM/wink-blushing.gif',
+                   'https://c.tenor.com/WYtyZP1TAlAAAAAM/wink-cute.gif',
+                   'https://c.tenor.com/TiEN8ncuLG4AAAAM/iroha-ore-gairu.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} подмигнула {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items10))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'sweeties', description = 'назвать сладким(кой)', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "sweeties")
+async def sweeties(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items9 = ['https://c.tenor.com/B_ykrMegoywAAAAM/anime-sweet.gif',
+                  'https://c.tenor.com/lvoqCtnhlf8AAAAM/maid-anime.gif',
+                  'https://c.tenor.com/kVgsgrtCbJYAAAAM/sweetness-anime.gif', '']
+        embed = discord.Embed(title = f'  {ctx.author.name} назвал(а) {member.name} сладким(кой) ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items9))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'baka', description = 'назвать бакой', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "baka")
+async def baka(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items8 = ['https://c.tenor.com/Xcr8fHyf84gAAAAM/baka-anime.gif',
+                  'https://c.tenor.com/UsggMuRixo0AAAAM/baka-anime.gif',
+                  'https://c.tenor.com/G4zCaHnNxysAAAAM/anime-boy-baka-baka.gif',
+                  'https://c.tenor.com/smRK3hdF5DMAAAAM/baka-anime.gif',
+                  'https://c.tenor.com/ESvZeEc2lIQAAAAM/baka-anime.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} назвал(а) бакой {member.name}  ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items8))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'bloodsuck', description = 'выпить кровь', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "bloodsuck")
+async def bloodsuck(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items7 = ['https://c.tenor.com/pbihHtECxXcAAAAM/laito-anime.gif',
+                  'https://c.tenor.com/VcbNZcjHU1cAAAAM/demi-chan-wa-kataritai-sexual.gif',
+                  'https://c.tenor.com/adecnFrCqRsAAAAM/neck-no-blood.gif',
+                  'https://c.tenor.com/AMhWheds0iIAAAAM/suck-finger-suck.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} выпил(а) кровь с {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items7))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+        await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'cuddle', description = 'затискать', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "cuddle")
+async def cuddle(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items6 = ['https://c.tenor.com/sBFE3GeNpJ4AAAAM/tackle-hug-couple.gif',
+                  'https://c.tenor.com/4mJqTEl73VwAAAAM/dragon-hug.gif',
+                  'https://c.tenor.com/kP7ssdam30oAAAAM/love-hug.gif',
+                  'https://c.tenor.com/zEz00ZxujqMAAAAM/blush-hug.gif',
+                  'https://c.tenor.com/osnNTrgJJ-QAAAAM/cuddle-anime.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} затискал(а) {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items6))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'steal', description = 'обокрасть', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "steal")
+async def steal(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items5 = ['https://c.tenor.com/oZW-P6fFn98AAAAM/kanna-kamui-anime.gif',
+                  'https://c.tenor.com/CE9p53io5FkAAAAM/sad-dont-steal-my-strawberry.gif',
+                  'https://c.tenor.com/h2vtYezIN_cAAAAM/konosuba-kazuma.gif',
+                  'https://c.tenor.com/MOC9e1NY10EAAAAM/bokuto-kotaro.gif',
+                  'https://c.tenor.com/o-ah2Q7V1LsAAAAd/hug-anime.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} обокрал(а) {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items5))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'lewd', description = 'назвать извраженцем(кой)', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "lewd")
+async def steal(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items4 = ['https://c.tenor.com/Zpt8lzrb5bgAAAAM/futakana-smug-anime.gif',
+                  'https://c.tenor.com/513s3tmHbUYAAAAM/lewd-anime.gif',
+                  'https://c.tenor.com/hby4ao2OnKwAAAAM/lewd-anime.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} назвал(а) извращенцем(кой) {member.name} ',
+                              color = 0xff80ff)
+        embed.set_image(url = random.choice(items4))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'bite', description = 'укусить', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "bite")
+async def bite(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'   Отметьте пользователя  ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items3 = ['https://c.tenor.com/nkNsOraAx4AAAAAM/anime-bite.gif',
+                  'https://c.tenor.com/4j3hMz-dUz0AAAAM/anime-love.gif',
+                  'https://c.tenor.com/8UjO54apiUIAAAAM/gjbu-bite.gif',
+                  'https://c.tenor.com/0uRmrUvyZFEAAAAM/vamp-vampire-bite.gif',
+                  'https://c.tenor.com/8Q9PcM5GL2QAAAAM/anime-ear-ear-bite.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} укусил(а) {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items3))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'tease', description = 'дразнить', options = [{"name": "member", "description": "пользователь", "type": 6, "required": True}], guild_ids = None)
+@client.command(name = "tease")
+async def tease(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items2 = ['https://c.tenor.com/-kkUIIbbaRgAAAAM/anime-tease.gif',
+                  'https://c.tenor.com/YBCrzZ36tW8AAAAM/anime-boy.gif',
+                  'https://c.tenor.com/EcxFEo0E-kgAAAAM/jujuju-anime.gif',
+                  'https://c.tenor.com/oXzN8LHMNxsAAAAM/hanako-tease.gif',
+                  'https://c.tenor.com/kac1ZogD8GcAAAAM/anime-love.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} дразнит {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items2))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'feed', description = 'кушать/кормить', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = "feed")
+async def feed(ctx, member: discord.Member = None):
+    global embed
+    if member is None:
+        items1 = ['https://c.tenor.com/p5DGewKTyQAAAAAM/loli-dragon.gif',
+                  'https://c.tenor.com/K-46u3QTNnUAAAAM/anime-food.gif',
+                  'https://c.tenor.com/pNfpHpgVxF4AAAAM/eating-anime.gif',
+                  'https://c.tenor.com/OUDudKla2pIAAAAM/homura-chika.gif',
+                  'https://c.tenor.com/MyhZzxE8vsQAAAAM/cute-eat.gif',
+                  'https://c.tenor.com/CQCMmVhDUjkAAAAM/eat-anime.gif',
+                  'https://c.tenor.com/iFmwaM6-CDUAAAAM/ice-cream-anime.gif']
+        embed = discord.Embed(title = f' {ctx.author.name}  хорошо покушал(а) ', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+        embed.set_image(url = random.choice(items1))
+    if member is not None:
+        items = ['https://c.tenor.com/CHTk5L8ls8cAAAAM/eat-food.gif',
+                 'https://c.tenor.com/kcpMVM8nvMwAAAAM/tsumiki-miniwa-acchi-kocchi.gif',
+                 'https://c.tenor.com/gIbE9pZ7raYAAAAM/wataten-watashi-ni-tenshi-ga-maiorita.gif',
+                 'https://c.tenor.com/xS09IqCS1e0AAAAM/anime-anime-boy.gif',
+                 'https://c.tenor.com/TviTsQOJYkkAAAAM/anime-feed.gif',
+                 'https://c.tenor.com/_Wn5KdSnphEAAAAM/anime-feed-anime.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} кормит {member.name}', color = 0xff80ff)
+        embed.set_image(url = random.choice(items))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(description = 'информация')
+async def info(ctx):
+    embed = discord.Embed(title = f' Сервер поддержки',
+                          url="https://discord.gg/GFhbzRDadw" , color = 0xff80ff)
+    embed.set_thumbnail(url = "https://avatanplus.com/files/resources/original/582de0656e50815873348c4c.png")
+    embed.add_field(name = " **Информация о боте:**\n", value = "**Мой создатель:**\n"
+                                        "Sorano#2302\n", inline = True)
+    embed.add_field(name = "Написана на:\n", value = "python 3.9\n", inline = True)
+    embed.add_field(name = "Моя версия:\n", value = "1.0\n", inline = True)
+    embed.add_field(name = "Команд:\n", value = "53\n", inline = True)
+    embed.add_field(name = "Серверов:\n", value = f'{len(client.guilds)} \n', inline = True)
+    embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'cry', description = 'плакать', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'cry')
+async def cry(ctx, member: discord.Member = None):
+    if member is None:
+        items22 = ['https://c.tenor.com/OhuSWqAsQH4AAAAM/anime-girl-sad-sad.gif',
+                   'https://c.tenor.com/OfYt0T0tgCYAAAAM/anime-cry.gif',
+                   'https://c.tenor.com/dTgqu4CcSKEAAAAM/cry-sad.gif',
+                   'https://c.tenor.com/2pawKZu4h_oAAAAM/sad-anime.gif',
+                   'https://c.tenor.com/SgjbrdojHZwAAAAM/anohana-tears.gif',
+                   'https://c.tenor.com/otSAwjPqcJsAAAAM/sad-cry.gif',
+                   'https://c.tenor.com/QI1bpPc2icsAAAAM/anime-cry.gif',
+                   'https://c.tenor.com/6WGsL7J3BggAAAAM/hug-anime.gif',
+                   'https://c.tenor.com/rI6L9q1-7V0AAAAM/glri-anime.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} плачет... ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items22))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items = ['https://c.tenor.com/OhuSWqAsQH4AAAAM/anime-girl-sad-sad.gif',
+                 'https://c.tenor.com/OfYt0T0tgCYAAAAM/anime-cry.gif',
+                 'https://c.tenor.com/dTgqu4CcSKEAAAAM/cry-sad.gif',
+                 'https://c.tenor.com/2pawKZu4h_oAAAAM/sad-anime.gif',
+                 'https://c.tenor.com/SgjbrdojHZwAAAAM/anohana-tears.gif',
+                 'https://c.tenor.com/otSAwjPqcJsAAAAM/sad-cry.gif',
+                 'https://c.tenor.com/QI1bpPc2icsAAAAM/anime-cry.gif',
+                 'https://c.tenor.com/6WGsL7J3BggAAAAM/hug-anime.gif',
+                 'https://c.tenor.com/rI6L9q1-7V0AAAAM/glri-anime.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} плачет из-за {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'clear', description = 'очистить чат', options = [{"name": "amount", "description": "сума сообщений","type": 10, "required": False}], guild_ids = None)
+@client.command(pass_context = True)
+@commands.has_permissions(administrator= True)
+async def clear(ctx, amount=1000):
+    await ctx.channel.purge(limit = amount)
+
+
+@client.command(pass_context = True)
+@commands.has_permissions(administrator = True)
+async def kick(ctx, member: discord.Member, *, reason=None):
+    await member.kick(reason = reason)
+    embed = discord.Embed(title = f'Kick user {member}', color = 0xff80ff)
+    kicked = await ctx.send(embed = embed)
+    await kicked.add_reaction('<a:emoji_36:937995398444904448>')
+
+
+@client.command()
+@commands.has_permissions(administrator = True)
+async def mute(ctx, member: discord.Member,*, time: int = None):
+    mute_role = discord.utils.get(member.guild.roles, name = 'mute')
+    await member.add_roles(mute_role)
+    embed = discord.Embed(title = f'У {member} ограничение чата за нарушение прав!', color = 0xff80ff)
+    muted = await ctx.send(embed = embed)
+    await muted.add_reaction('<a:emoji_36:937995398444904448>')
+    await asyncio.sleep(time * 60)
+    await member.remove_roles(mute_role)
+
+
+
+@client.command(pass_context = True)
+@commands.has_permissions(administrator = True)
+async def ban(ctx, member: discord.Member, reason=''):
+    await member.ban(reason = reason)
+    embed = discord.Embed(title = f'Ban user {member}', color = 0xff80ff)
+    baned = await ctx.send(embed = embed)
+    await baned.add_reaction('<a:emoji_36:937995398444904448>')
+
+
+@client.event
+async def on_member_join(member):
+    channel = client.get_channel(906793314735489076)
+    role = discord.utils.get(member.guild.roles, id = 906817000519663626)
+    await member.add_roles(role)
+    embed = discord.Embed(
+        description = f'Поздравляем {member.name}! Ты выбрал дверь и нашёл Бетти! Загляни в <#906795851849039942>, и ознакомься с правилами библиотеки! ',
+        color = 0xff80ff)
+    embed.set_image(url = "https://67.media.tumblr.com/d29376aada982c330bdd96509ea74b48/tumblr_o6j578bUqC1tjehr9o2_500.gif")
+    await channel.send(embed=embed)
+
+
+@slash.slash(name = 'sing', description = 'петь', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'sing')
+async def sing(ctx, member: discord.Member = None):
+    if member is None:
+        items23 = ['https://c.tenor.com/kmyxzKPMUs8AAAAM/anime-sing.gif',
+                   'https://c.tenor.com/N-NaH7vObeYAAAAM/anime-howan.gif',
+                   'https://c.tenor.com/NKenoQv-Kw8AAAAM/chino-anime.gif',
+                   'https://c.tenor.com/yYvpwv7RJlAAAAAM/bang-dream-bandori.gif',
+                   'https://c.tenor.com/ChPBYtLjobcAAAAM/ohnaruto-muni-d4dj-first-mix.gif',
+                   'https://c.tenor.com/WQo2-FPrZJYAAAAM/crow-crow-sbr.gif',
+                   'https://c.tenor.com/fXjgPgl22iEAAAAM/minato-yukina-bang-dream.gif',
+                   'https://c.tenor.com/gsgG4MM_mhsAAAAM/tsumiki-singing.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} поёт ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items23))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items24 = ['https://c.tenor.com/kmyxzKPMUs8AAAAM/anime-sing.gif',
+                   'https://c.tenor.com/N-NaH7vObeYAAAAM/anime-howan.gif',
+                   'https://c.tenor.com/NKenoQv-Kw8AAAAM/chino-anime.gif',
+                   'https://c.tenor.com/yYvpwv7RJlAAAAAM/bang-dream-bandori.gif',
+                   'https://c.tenor.com/ChPBYtLjobcAAAAM/ohnaruto-muni-d4dj-first-mix.gif',
+                   'https://c.tenor.com/WQo2-FPrZJYAAAAM/crow-crow-sbr.gif',
+                   'https://c.tenor.com/fXjgPgl22iEAAAAM/minato-yukina-bang-dream.gif',
+                   'https://c.tenor.com/gsgG4MM_mhsAAAAM/tsumiki-singing.gif']
+        embed = discord.Embed(title = ' {ctx.author.name} поёт для {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items24))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'playing', description = 'играть', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'playing')
+async def playing(ctx, member: discord.Member = None):
+    if member is None:
+        items25 = ['https://c.tenor.com/LTNxseliZ6gAAAAM/himouto-gaming.gif',
+                   'https://c.tenor.com/ml-Znu6s0q0AAAAM/anime-gaming.gif',
+                   'https://c.tenor.com/3KlWofKWQV8AAAAM/video-games-anime.gif',
+                   'https://c.tenor.com/zi0lNOloOdEAAAAM/anime-gifs-to-communicate.gif',
+                   'https://c.tenor.com/zKowF7AjXk4AAAAC/chiaki-nanami-danganronpa.gif',
+                   'https://c.tenor.com/qdf9PVQz0ccAAAAM/anime-gamer.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} играет', color = 0xff80ff)
+        embed.set_image(url = random.choice(items25))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items26 = ['https://c.tenor.com/LTNxseliZ6gAAAAM/himouto-gaming.gif',
+                   'https://c.tenor.com/ml-Znu6s0q0AAAAM/anime-gaming.gif',
+                   'https://c.tenor.com/3KlWofKWQV8AAAAM/video-games-anime.gif',
+                   'https://c.tenor.com/zi0lNOloOdEAAAAM/anime-gifs-to-communicate.gif',
+                   'https://c.tenor.com/zKowF7AjXk4AAAAC/chiaki-nanami-danganronpa.gif',
+                   'https://c.tenor.com/qdf9PVQz0ccAAAAM/anime-gamer.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} играет с {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items26))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'drink', description = 'пить', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'drink')
+async def drink(ctx, member: discord.Member = None):
+    if member is None:
+        items27 = ['https://c.tenor.com/u7RZ3mQl06sAAAAM/coke-drinking.gif',
+                   'https://c.tenor.com/lk8yVO8VOEsAAAAM/drinking-kobayashi.gif',
+                   'https://c.tenor.com/uaEnYQb4Iy8AAAAM/neko-nekohime.gif',
+                   'https://c.tenor.com/sMNopBaNxBUAAAAC/juice-anime.gif',
+                   'https://c.tenor.com/aPSQxKarUAsAAAAd/nananiji-drink.gif',
+                   'https://c.tenor.com/N8N8_6UbGFIAAAAC/milk-anime.gif',
+                   'https://c.tenor.com/s_RrwUBI7KAAAAAM/magireko-magia-record.gif',
+                   'https://c.tenor.com/sIvDWlrALSUAAAAM/azusa-hamaoka.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} пьёт ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items27))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items28 = ['https://c.tenor.com/u7RZ3mQl06sAAAAM/coke-drinking.gif',
+                   'https://c.tenor.com/lk8yVO8VOEsAAAAM/drinking-kobayashi.gif',
+                   'https://c.tenor.com/uaEnYQb4Iy8AAAAM/neko-nekohime.gif',
+                   'https://c.tenor.com/sMNopBaNxBUAAAAC/juice-anime.gif',
+                   'https://c.tenor.com/aPSQxKarUAsAAAAd/nananiji-drink.gif',
+                   'https://c.tenor.com/N8N8_6UbGFIAAAAC/milk-anime.gif',
+                   'https://c.tenor.com/s_RrwUBI7KAAAAAM/magireko-magia-record.gif',
+                   'https://c.tenor.com/sIvDWlrALSUAAAAM/azusa-hamaoka.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} пьёт вместе с {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items28))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'sleep', description = 'спать', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'sleep')
+async def sleep(ctx, member: discord.Member = None):
+    if member is None:
+        items29 = ['https://c.tenor.com/HItBOocy6ikAAAAM/umaru-sleeping.gif',
+                   'https://c.tenor.com/c-M3EdgOiAsAAAAM/kanna-kanna-kamui.gif',
+                   'https://c.tenor.com/jrBQmuo2elMAAAAM/anime-sleep.gif',
+                   'https://c.tenor.com/0w4WLc-5KPgAAAAM/gakkou-anime.gif',
+                   'https://c.tenor.com/BV0xBnKK6VIAAAAd/anime-sofa.gif',
+                   'https://c.tenor.com/PWCt_3dZzhMAAAAM/anime-sleeping.gif',
+                   'https://c.tenor.com/Ps4sr2jUdGEAAAAM/anime-sleep.gif',
+                   'https://c.tenor.com/u2f7GM10EKQAAAAM/sleep-anime.gif',
+                   'https://c.tenor.com/StgQ0RZS5tgAAAAM/spooning.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} спит ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items29))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items30 = ['https://c.tenor.com/FhWQ_gKFi7YAAAAM/persona-persona4.gif',
+                   'https://c.tenor.com/JTqXUbfSSkYAAAAM/anime-bed.gif',
+                   'https://c.tenor.com/GuHHnDT6quYAAAAM/anime-couples.gif',
+                   'https://c.tenor.com/ZS8g3uTnHYIAAAAM/anime-bed.gif',
+                   'https://c.tenor.com/i50gylGKwksAAAAC/cat-kitten.gif',
+                   'https://c.tenor.com/okeP090NK1cAAAAC/anime-couples.gif',
+                   'https://c.tenor.com/PWCt_3dZzhMAAAAM/anime-sleeping.gif',
+                   'https://c.tenor.com/sM94P0cEjz0AAAAC/cuddle-sleep.gif',
+                   'https://c.tenor.com/IpzUPvWKhJEAAAAd/kon-yui.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} спит вместе с {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items30))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'snowball', description = 'бросить снежку', options = [{"name": "member", "description": "пользователь","type": 6, "required": True}], guild_ids = None)
+@client.command(name = 'snowball')
+async def snowball(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'   Отметьте пользователя  ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items31 = ['https://c.tenor.com/ZZeR0E20gfAAAAAM/ash-serena-ash.gif',
+                   'https://c.tenor.com/4CYDwd4OCT4AAAAM/snowball-fight.gif',
+                   'https://c.tenor.com/nDxCGQUnuDEAAAAM/snowball-anime.gif',
+                   'https://c.tenor.com/kjdKxjGHpuIAAAAC/anime-acchi-kocchi.gif',
+                   'https://c.tenor.com/pvMYzXPpVLIAAAAM/acchi-kocchi-anime.gif',
+                   'https://c.tenor.com/PfJisM8oiCwAAAAM/azumanga-daioh-azumanga.gif ',
+                   'https://c.tenor.com/Gy7fre92ClcAAAAM/head-face.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} бросает снежку в {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items31))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'lazy', description = 'лениться', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'lazy')
+async def lazy(ctx, member: discord.Member = None):
+    if member is None:
+        items32 = ['https://c.tenor.com/6NEvyPJepWEAAAAM/anime-lazy.gif',
+                   'https://c.tenor.com/QSBV-iclSucAAAAM/anime-gabriel.gif',
+                   'https://c.tenor.com/yzGKuxVoePcAAAAM/kanna-kamui.gif',
+                   'https://c.tenor.com/3kvV4pDzs80AAAAd/oreki-houtarou-weekend-plans.gif',
+                   'https://c.tenor.com/BiP4oKawFEIAAAAM/anime-the.gif',
+                   'https://c.tenor.com/PORlinUAPhwAAAAC/girl-anime.gif',
+                   'https://c.tenor.com/E-GDeMqscZEAAAAM/tired-anime.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} лениться ', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+        embed.set_image(url = random.choice(items32))
+    if member is not None:
+        items33 = ['https://c.tenor.com/6NEvyPJepWEAAAAM/anime-lazy.gif',
+                   'https://c.tenor.com/QSBV-iclSucAAAAM/anime-gabriel.gif',
+                   'https://c.tenor.com/yzGKuxVoePcAAAAM/kanna-kamui.gif',
+                   'https://c.tenor.com/3kvV4pDzs80AAAAd/oreki-houtarou-weekend-plans.gif',
+                   'https://c.tenor.com/BiP4oKawFEIAAAAM/anime-the.gif',
+                   'https://c.tenor.com/PORlinUAPhwAAAAC/girl-anime.gif',
+                   'https://c.tenor.com/E-GDeMqscZEAAAAM/tired-anime.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} назвал(а) {member.name} леньтяем(леньтяйкай) ',
+                              color = 0xff80ff)
+        embed.set_image(url = random.choice(items33))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'angry', description = 'злиться', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'angry')
+async def angry(ctx, member: discord.Member = None):
+    if member is None:
+        items34 = ['https://c.tenor.com/rzDkOlEDun0AAAAM/hayase-nagatoro-nagatoro-angry.gif',
+                   'https://c.tenor.com/X3x3Y2mp2W8AAAAM/anime-angry.gif',
+                   'https://c.tenor.com/W9kzAnY4pQoAAAAM/ram-anime.gif',
+                   'https://c.tenor.com/8m58X62z6C8AAAAM/homura-chika.gif',
+                   'https://c.tenor.com/q0T5P-gdNSMAAAAM/angry-furious.gif',
+                   'https://c.tenor.com/MifS9QJUGA4AAAAM/anime-angry.gif',
+                   'https://c.tenor.com/9JUYPgGXEtgAAAAC/anime-angly.gif',
+                   'https://c.tenor.com/RtQzS1HCLvYAAAAM/taiga-toradora.gif',
+                   'https://c.tenor.com/Ln-j0vBojk0AAAAM/pouty-anime.gif',
+                   'https://c.tenor.com/9JjBiqaxzdAAAAAC/anime-angry.gif',
+                   'https://c.tenor.com/LD4xtbN1RgYAAAAM/kamisama-anime.gif',
+                   'https://c.tenor.com/m7GE0heNsPYAAAAC/anime-scary.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} злиться ', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+        embed.set_image(url = random.choice(items34))
+    if member is not None:
+        items35 = ['https://c.tenor.com/rzDkOlEDun0AAAAM/hayase-nagatoro-nagatoro-angry.gif',
+                   'https://c.tenor.com/X3x3Y2mp2W8AAAAM/anime-angry.gif',
+                   'https://c.tenor.com/W9kzAnY4pQoAAAAM/ram-anime.gif',
+                   'https://c.tenor.com/8m58X62z6C8AAAAM/homura-chika.gif',
+                   'https://c.tenor.com/q0T5P-gdNSMAAAAM/angry-furious.gif',
+                   'https://c.tenor.com/MifS9QJUGA4AAAAM/anime-angry.gif',
+                   'https://c.tenor.com/9JUYPgGXEtgAAAAC/anime-angly.gif',
+                   'https://c.tenor.com/RtQzS1HCLvYAAAAM/taiga-toradora.gif',
+                   'https://c.tenor.com/Ln-j0vBojk0AAAAM/pouty-anime.gif',
+                   'https://c.tenor.com/9JjBiqaxzdAAAAAC/anime-angry.gif',
+                   'https://c.tenor.com/LD4xtbN1RgYAAAAM/kamisama-anime.gif',
+                   'https://c.tenor.com/m7GE0heNsPYAAAAC/anime-scary.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} злиться на {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items35))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'run', description = 'бегать', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'run')
+async def run(ctx, member: discord.Member = None):
+    if member is None:
+        items36 = ['https://c.tenor.com/mUIXigPWPuYAAAAd/anime-anime-girl-running.gif',
+                   'https://c.tenor.com/yky_3Nk0xNYAAAAM/uma-musume-special-week.gif',
+                   'https://c.tenor.com/PAOfog-IuSAAAAAM/anime-nezuko-kamado.gif',
+                   'https://c.tenor.com/G2YT33dvNjQAAAAC/anime.gif',
+                   'https://c.tenor.com/0UpvCp-bmOYAAAAC/run-away-run.gif',
+                   'https://c.tenor.com/zD2iXGCoujkAAAAC/ganbaruby-run.gif',
+                   'https://c.tenor.com/hcYSoKz5Q4gAAAAM/karen-kujo.gif',
+                   'https://c.tenor.com/78ezcunXaRIAAAAC/run.gif', 'https://c.tenor.com/edqki2kGsy0AAAAC/mwa.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} бежит ', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+        embed.set_image(url = random.choice(items36))
+    if member is not None:
+        items37 = ['https://c.tenor.com/mUIXigPWPuYAAAAd/anime-anime-girl-running.gif',
+                   'https://c.tenor.com/yky_3Nk0xNYAAAAM/uma-musume-special-week.gif',
+                   'https://c.tenor.com/PAOfog-IuSAAAAAM/anime-nezuko-kamado.gif',
+                   'https://c.tenor.com/G2YT33dvNjQAAAAC/anime.gif',
+                   'https://c.tenor.com/0UpvCp-bmOYAAAAC/run-away-run.gif',
+                   'https://c.tenor.com/zD2iXGCoujkAAAAC/ganbaruby-run.gif',
+                   'https://c.tenor.com/hcYSoKz5Q4gAAAAM/karen-kujo.gif',
+                   'https://c.tenor.com/78ezcunXaRIAAAAC/run.gif', 'https://c.tenor.com/edqki2kGsy0AAAAC/mwa.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} убегает от {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items37))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'shout', description = 'кричать', options = [{"name": "member", "description": "пользователь","type": 6, "required": True}], guild_ids = None)
+@client.command(name = 'shout')
+async def shout(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'   Отметьте пользователя  ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items38 = ['https://c.tenor.com/-611TwvdxQcAAAAM/anime-zenitsu.gif',
+                   'https://c.tenor.com/R3Y6l274sQAAAAAM/chika-fujiwara-anime.gif',
+                   'https://c.tenor.com/SVuIVt9pKa8AAAAM/kaguya-sama-love-is-war-anime.gif',
+                   'https://c.tenor.com/haRc6fQ_IEIAAAAM/anime-scream.gif',
+                   'https://c.tenor.com/3CIjrSaQfqoAAAAM/anime-angry.gif',
+                   'https://c.tenor.com/JBI9Ux7fZFIAAAAM/kaguya-face-roar.gif',
+                   'https://c.tenor.com/vp-CDr4vuxcAAAAM/taringa-anime.gif',
+                   'https://c.tenor.com/zdolHKcev7sAAAAC/hanagaki-takemichi-takemichi-scream.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} кричит на {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items38))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'draw', description = 'рисовать', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'draw')
+async def draw(ctx, member: discord.Member = None):
+    global embed
+    if member is None:
+        items36 = ['https://c.tenor.com/A0-Zo3y-HLQAAAAM/anime-drawings.gif',
+                   'https://c.tenor.com/oiykuBCQ9WsAAAAM/back-to-school-lazy.gif',
+                   'https://c.tenor.com/DK7QeY4RTnQAAAAM/drawing-aesthetic.gif',
+                   'https://c.tenor.com/tHnnUJSL72QAAAAC/drawing-anime.gif',
+                   'https://c.tenor.com/wEQP6dEzhPsAAAAM/color-art.gif',
+                   'https://c.tenor.com/vpJMWhDkda4AAAAC/princess-jellyfish-drawing.gif',
+                   'https://c.tenor.com/SFI4Z-stCTEAAAAM/art-monster.gif',
+                   'https://c.tenor.com/Q1HkT7UOcTcAAAAC/tsumugi-inuzuka-anime.gif',
+                   'https://c.tenor.com/9NYmFse04ZAAAAAC/yato-noragami.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} рисует ', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+        embed.set_image(url = random.choice(items36))
+    if member is not None:
+        items37 = ['https://c.tenor.com/A0-Zo3y-HLQAAAAM/anime-drawings.gif',
+                   'https://c.tenor.com/oiykuBCQ9WsAAAAM/back-to-school-lazy.gif',
+                   'https://c.tenor.com/DK7QeY4RTnQAAAAM/drawing-aesthetic.gif',
+                   'https://c.tenor.com/tHnnUJSL72QAAAAC/drawing-anime.gif',
+                   'https://c.tenor.com/wEQP6dEzhPsAAAAM/color-art.gif',
+                   'https://c.tenor.com/vpJMWhDkda4AAAAC/princess-jellyfish-drawing.gif',
+                   'https://c.tenor.com/SFI4Z-stCTEAAAAM/art-monster.gif',
+                   'https://c.tenor.com/Q1HkT7UOcTcAAAAC/tsumugi-inuzuka-anime.gif',
+                   'https://c.tenor.com/9NYmFse04ZAAAAAC/yato-noragami.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} рисует {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items37))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'sad', description = 'грустить', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'sad')
+async def sad(ctx, member: discord.Member = None):
+    if member is None:
+        items38 = ['https://c.tenor.com/HPdVPFR-BasAAAAM/anime-sad.gif',
+                   'https://c.tenor.com/dWkr9_iQL8QAAAAC/anime-dan-machi.gif',
+                   'https://c.tenor.com/i3uWiBCMgh8AAAAM/sad-aesthetic.gif',
+                   'https://c.tenor.com/p0hJkNOIMukAAAAM/anime-sad.gif',
+                   'https://c.tenor.com/C1Iny14iXjoAAAAd/life-sad.gif',
+                   'https://c.tenor.com/MXDXYyetjDkAAAAd/im-sorry-sad.gif',
+                   'https://c.tenor.com/9GwESelzF9kAAAAM/foxe-loh.gif',
+                   'https://c.tenor.com/PHBzhcOds5oAAAAC/lonely-windy.gif',
+                   'https://c.tenor.com/ESe9mqJlywkAAAAC/anime-girl.gif',
+                   'https://c.tenor.com/5RYW84nbNq4AAAAM/sad-eyes.gif',
+                   'https://c.tenor.com/O2Au5Db61BsAAAAC/norgami-hiyori.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} грустит ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items38))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items39 = ['https://c.tenor.com/HPdVPFR-BasAAAAM/anime-sad.gif',
+                   'https://c.tenor.com/dWkr9_iQL8QAAAAC/anime-dan-machi.gif',
+                   'https://c.tenor.com/i3uWiBCMgh8AAAAM/sad-aesthetic.gif',
+                   'https://c.tenor.com/p0hJkNOIMukAAAAM/anime-sad.gif',
+                   'https://c.tenor.com/C1Iny14iXjoAAAAd/life-sad.gif',
+                   'https://c.tenor.com/MXDXYyetjDkAAAAd/im-sorry-sad.gif',
+                   'https://c.tenor.com/9GwESelzF9kAAAAM/foxe-loh.gif',
+                   'https://c.tenor.com/PHBzhcOds5oAAAAC/lonely-windy.gif',
+                   'https://c.tenor.com/ESe9mqJlywkAAAAC/anime-girl.gif',
+                   'https://c.tenor.com/5RYW84nbNq4AAAAM/sad-eyes.gif',
+                   'https://c.tenor.com/O2Au5Db61BsAAAAC/norgami-hiyori.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} грустит из-за {member.name}  ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items39))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'clap', description = 'хлопать', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'clap')
+async def clap(ctx, member: discord.Member = None):
+    if member is None:
+        items45 = {'https://c.tenor.com/2RMlQdkpG1cAAAAC/clapping-anime.gif',
+                   'https://c.tenor.com/zVvMxtmpRaMAAAAC/taiga-asaka-clapping.gif',
+                   'https://c.tenor.com/tyb15RWixEYAAAAM/puck-anime.gif',
+                   'https://c.tenor.com/jncqY9-RbqcAAAAd/mushoku-tensei-roxy.gif',
+                   'https://c.tenor.com/ZaulhiAmLPsAAAAM/anime-clap.gif',
+                   'https://c.tenor.com/A7DDt7skz9UAAAAC/nekopara-catgirl.gif',
+                   'https://c.tenor.com/gcqIuGc-xWwAAAAC/bravo-applause.gif',
+                   'https://c.tenor.com/d8vq5hthkAoAAAAC/rimuru-tempest-rimuru.gif',
+                   'https://c.tenor.com/2XqdaHcEaGYAAAAC/anime-clapping.gif'}
+        embed = discord.Embed(title = f' {ctx.author.name} хлопает  ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items45))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items46 = {'https://c.tenor.com/2RMlQdkpG1cAAAAC/clapping-anime.gif',
+                   'https://c.tenor.com/zVvMxtmpRaMAAAAC/taiga-asaka-clapping.gif',
+                   'https://c.tenor.com/tyb15RWixEYAAAAM/puck-anime.gif',
+                   'https://c.tenor.com/jncqY9-RbqcAAAAd/mushoku-tensei-roxy.gif',
+                   'https://c.tenor.com/ZaulhiAmLPsAAAAM/anime-clap.gif',
+                   'https://c.tenor.com/A7DDt7skz9UAAAAC/nekopara-catgirl.gif',
+                   'https://c.tenor.com/gcqIuGc-xWwAAAAC/bravo-applause.gif',
+                   'https://c.tenor.com/d8vq5hthkAoAAAAC/rimuru-tempest-rimuru.gif',
+                   'https://c.tenor.com/2XqdaHcEaGYAAAAC/anime-clapping.gif'}
+        embed = discord.Embed(title = f' {ctx.author.name} хлопает {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items46))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'think', description = 'думать', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'think')
+async def think(ctx, member: discord.Member = None):
+    if member is None:
+        items43 = {'https://c.tenor.com/nqA9OzT3JzMAAAAM/anime-doubt.gif',
+                   'https://c.tenor.com/t80Qwz2QouMAAAAM/yuru-yuri-ayano-sugiura.gif',
+                   'https://c.tenor.com/IwyNIipPItQAAAAM/anime-naruto.gif',
+                   'https://c.tenor.com/fk67OlKF0GIAAAAM/anime-kawaii.gif',
+                   'https://c.tenor.com/psP-zXQWEyIAAAAC/anime-girl.gif',
+                   'https://c.tenor.com/IkKoicHruosAAAAM/emilia-re-zero.gif',
+                   'https://c.tenor.com/_t0e0J01bC4AAAAC/thinking-machikado-mazoku.gif',
+                   'https://c.tenor.com/VRaLXTCtEIIAAAAC/blush-anime.gif',
+                   'https://c.tenor.com/5Mb5JAzs1uIAAAAC/takane-shijou-anime.gif',
+                   'https://c.tenor.com/qdsPjZjB_poAAAAC/your-name-thinki.gif',
+                   'https://c.tenor.com/xYBh7GPuUrcAAAAC/hologra-hololive.gif'}
+        embed = discord.Embed(title = f' {ctx.author.name} думает', color = 0xff80ff)
+        embed.set_image(url = random.choice(items43))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items44 = {'https://c.tenor.com/nqA9OzT3JzMAAAAM/anime-doubt.gif',
+                   'https://c.tenor.com/t80Qwz2QouMAAAAM/yuru-yuri-ayano-sugiura.gif',
+                   'https://c.tenor.com/IwyNIipPItQAAAAM/anime-naruto.gif',
+                   'https://c.tenor.com/fk67OlKF0GIAAAAM/anime-kawaii.gif',
+                   'https://c.tenor.com/psP-zXQWEyIAAAAC/anime-girl.gif',
+                   'https://c.tenor.com/IkKoicHruosAAAAM/emilia-re-zero.gif',
+                   'https://c.tenor.com/_t0e0J01bC4AAAAC/thinking-machikado-mazoku.gif',
+                   'https://c.tenor.com/VRaLXTCtEIIAAAAC/blush-anime.gif',
+                   'https://c.tenor.com/5Mb5JAzs1uIAAAAC/takane-shijou-anime.gif',
+                   'https://c.tenor.com/qdsPjZjB_poAAAAC/your-name-thinki.gif',
+                   'https://c.tenor.com/xYBh7GPuUrcAAAAC/hologra-hololive.gif'}
+        embed = discord.Embed(title = f'  {ctx.author.name} думает о {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items44))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'stroking', description = 'гладить', options = [{"name": "member", "description": "пользователь","type": 6, "required": True}], guild_ids = None)
+@client.command(name = 'stroking')
+async def stroking(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'   Отметьте пользователя  ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items40 = ['https://c.tenor.com/Wth7fEpgZ7EAAAAC/neko-anime-girl.gif',
+                   'https://c.tenor.com/dmYhPDHbbI4AAAAM/misha-misha-necron-anos-voldigoad-the-misfit-of-demon-king-academy-headpat-pat.gif',
+                   'https://c.tenor.com/Jl-9-UGmbowAAAAC/nyaruko-pet.gif',
+                   'https://c.tenor.com/8DaE6qzF0DwAAAAM/neet-anime.gif',
+                   'https://c.tenor.com/hmzhWv3b9KsAAAAd/anime-head-pat-anime-head-rub.gif',
+                   'https://c.tenor.com/g75K3KA3VeAAAAAd/anime-sleep.gif',
+                   'https://c.tenor.com/cvOLxt5R3e4AAAAM/cute-adorable.gif',
+                   'https://c.tenor.com/YroVxwiL2dcAAAAC/ao-haru-ride-anime-boy.gif',
+                   'https://c.tenor.com/GPeAwtOCjY8AAAAM/anime-pet.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} гладит {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items40))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'massage', description = 'делать массаж', options = [{"name": "member", "description": "пользователь","type": 6, "required": True}], guild_ids = None)
+@client.command(name = 'massage')
+async def massage(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'   Отметьте пользователя  ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items41 = ['https://c.tenor.com/Rgzjgy2mhIAAAAAM/nekopara-massage.gif',
+                   'https://c.tenor.com/JUbd4NP4xDgAAAAd/sweet-blue-flowers-aoi-hana.gif',
+                   'https://c.tenor.com/hc7VGlUhXR0AAAAC/kumamiko-massage.gif',
+                   'https://c.tenor.com/UmHMK4TpD1EAAAAd/demon-slayer-kimetsu-no-yaiba.gif',
+                   'https://c.tenor.com/OoFYu0fflMIAAAAd/massage.gif']
+        embed = discord.Embed(title = f' {ctx.author.name} делает массаж {member.name}  ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items41))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'flower', description = 'дарить цветы', options = [{"name": "member", "description": "пользователь","type": 6, "required":True}], guild_ids = None)
+@client.command(name = 'flower')
+async def flower(ctx, member: discord.Member = None):
+    if member is None:
+        embed = discord.Embed(title = f'  Отметьте пользователя  ', description = '@member', color = 0xff80ff)
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    if member is not None:
+        items42 = ['https://c.tenor.com/jn9abzKOpl8AAAAd/anime-cute.gif',
+                   'https://c.tenor.com/2C7RbeLRjRAAAAAM/anime-boy.gif',
+                   'https://c.tenor.com/g-K8mW2Z5swAAAAM/anime-anime-girl.gif',
+                   'https://c.tenor.com/AfMzOowVaWwAAAAM/anime-flowers.gif',
+                   'https://c.tenor.com/7C-t7hLJSqYAAAAM/bungou-stray-dogs-bsd.gif',
+                   'https://c.tenor.com/ajUoi41d51QAAAAC/flowers-anime.gif']
+        embed = discord.Embed(title = f'  {ctx.author.name} дарит цветы {member.name} ', color = 0xff80ff)
+        embed.set_image(url = random.choice(items42))
+        embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'user', description = 'информация о пользователе', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'user')
+async def user(ctx, member: discord.Member = None):
+    if member == None:
+        member = ctx.author
+    roles = [role for role in member.roles]
+    embed = discord.Embed(title = f'***Информация о пользователе {member.name}***', color = 0xff80ff)
+    embed.set_thumbnail(url = member.avatar_url)
+    embed.add_field(name = 'ID', value = member.id, inline = True)
+    embed.add_field(name = 'Никнейм', value = member.display_name, inline = True)
+    embed.add_field(name = 'Аккаунт создан:', value = member.created_at.strftime('%d.%m.%Y'), inline = True)
+    embed.add_field(name = 'Присоединился к серверу:', value = member.joined_at.strftime('%d.%m.%Y'), inline = True)
+    embed.add_field(name = 'Роли:', value = " ".join(role.mention for role in roles), inline = True)
+    embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = embed)
+
+
+@slash.slash(name = 'create', description = 'создать розыгрыш', options = [{"name": "time", "description": "время","type": 3, "required": True},{"name": "prize", "description": "приз","type": 3, "required":True}], guild_ids = None)
+@client.command(name="create")
+@commands.has_permissions(administrator = True)
+async def create(ctx, time=None, *, prize=None):
+    if time == None:
+        return await ctx.send(embed = discord.Embed(title = f'🕟 Укажите время!', color = 0xff80ff))
+    elif prize == None:
+        return await ctx.send(embed = discord.Embed(title = f' 🎁Укажите приз!', color = 0xff80ff))
+    embed = discord.Embed(title = '🎉Розыгрыш', description = f'🎁Приз: **{prize}**!', color = 0xff80ff)
+    time_convert = {"d": 86400, "h": 3600, "m": 60, "s": 1}
+    gawtime = int(time[0]) * time_convert[time[-1]]
+    embed.set_footer(text = f'🕟Розыгрыш закончиться через {time}')
+    gaw_msg = await ctx.send(embed = embed)
+    await gaw_msg.add_reaction("🎉")
+    await asyncio.sleep(gawtime)
+    new_gaw_msg = await ctx.channel.fetch_message(gaw_msg.id)
+    users = await new_gaw_msg.reactions[0].users().flatten()
+    users.pop(users.index(client.user))
+    winner = random.choice(users)
+    await ctx.send(embed = discord.Embed(title = '🥳Выиграл:', description = f'{winner}', color = 0xff80ff))
+
+
+@slash.slash(description = 'информация о сервере')
+async def server(ctx):
+    icon = str(ctx.guild.icon_url)
+    guild = ctx.guild
+    role_count = len(ctx.guild.roles)
+    online=0
+    offline=0
+    idle=0
+    text=0
+    voice=0
+    dnd=0
+    for member in ctx.guild.members:
+        if str(member.status)=="online":
+            online+=1
+        if str(member.status)=="idle":
+            idle+=1
+        if str(member.status)=="offline":
+            offline+=1
+        if str(member.status)=="dnd":
+            dnd+=1
+    for channel in ctx.guild.channels:
+        if str(channel.type)=="text":
+            text+=1
+        if str (channel.type)=="voice":
+            voice+=1
+    list_of_bots = [bot.mention for bot in ctx.guild.members if bot.bot]
+    serverinfoEmbed = discord.Embed( color = 0xff80ff)
+    serverinfoEmbed.add_field(name = '🪧Название:', value = f'{guild.name}', inline = False)
+    serverinfoEmbed.add_field(name = '🧾ID:', value = str(guild.id), inline = False)
+    serverinfoEmbed.add_field(name = '🌏Количество учасников:', value = guild.member_count, inline = False)
+    serverinfoEmbed.add_field(name = '📊 Уровень:', value = str(guild.verification_level), inline = False)
+    serverinfoEmbed.add_field(name = '🗓️ Сервер создан:', value = guild.created_at.strftime('%d.%m.%Y'), inline = True)
+    serverinfoEmbed.add_field(name = '🗂️Количество ролей:', value = str(role_count), inline = False)
+    serverinfoEmbed.add_field(name = 'Боты:', value = ', '.join(list_of_bots), inline = False)
+    serverinfoEmbed.add_field(name = 'Статус учасников:', value = f'<:online:939130426159685663>**Онлайн:** {online}\n<:idle:939130402038243348>**Не активен:** {idle}\n<:dnd:940204819195510795>**Не беспокоить**:{dnd}\n <:offline:939130444417482842>**Офлайн:** {offline} ', inline = False)
+    serverinfoEmbed.add_field(name = 'Каналы:', value = f'✉**Текстовых:** {text}\n🎙️**Голосовых:** {voice}', inline = False)
+    serverinfoEmbed.set_thumbnail(url = icon)
+    await ctx.send(embed = serverinfoEmbed)
+
+
+@slash.slash(name = 'avatar', description = 'аватар', options = [{"name": "member", "description": "пользователь","type": 6, "required": False}], guild_ids = None)
+@client.command(name = 'avatar')
+async def avatar(ctx, member: discord.Member = None):
+    if member == None:
+        member = ctx.author
+    memberAvatar = member.avatar_url
+    avaEmbed = discord.Embed(title = f'Аватар {member.name}', color = 0xff80ff)
+    avaEmbed.set_image(url = memberAvatar)
+    avaEmbed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed = avaEmbed)
+
+
+@slash.slash(name = 'complaint', description = 'подать жалобу', options = [{"name": "member", "description": "пользователь","type": 6, "required":True}, {"name": "rule", "description": "правило","type": 3, "required":True}], guild_ids = None)
+@client.command(name='complaint')
+async def complaint (ctx,member: discord.Member= None, rule=''):
+    await ctx.channel.purge(limit = 1)
+    embed= discord.Embed(title = f'В течении дня ваша жалоба будет рассмотреннна!', description = f'Отправитель: {ctx.author}\nНарушитель:{member}\nПричина:{rule}  ', color = 0xff80ff)
+    await ctx.send(embed=embed)
+
+
+@slash.slash(name = 'm', description = 'анкета на модератора', options = [{"name": "name", "description": " Ваше имя", "type": 3, "required": True},{"name": "age", "description": "Ваш возраст", "type": 3, "required": True},{"name": "experience", "description": "Есть ли у вас стаж работы модератором?", "type": 3, "required": True},{"name": "time", "description": "Сколько времени готовы уделять серверу?", "type": 3, "required": True}], guild_ids = None)
+@client.command(name='m')
+async def m (ctx,  name=None, age=None, experience='', time=''):
+    embed= discord.Embed(title = f'<a:emoji_36:937995398444904448>Анкета на модератора успешно заполнена {ctx.author} !', description = f'<:emoji_39:937998892501463090> {name}\n<:emoji_39:937998892501463090> {age}\n<:emoji_39:937998892501463090> {experience}\n<:emoji_39:937998892501463090>  {time}  ', color = 0xff80ff)
+    embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed=embed)
+
+
+@slash.slash(name = 'p', description = 'анкета на пиар-менеджера', options = [{"name": "name", "description": " Ваше имя", "type": 3, "required": True},{"name": "age", "description": "Ваш возраст", "type": 3, "required": True},{"name": "experience", "description": "Есть ли у вас стаж работы пиар-менеджером?", "type": 3, "required": True},{"name": "number", "description": "Сколько партнерок вы готовы заключать в день?", "type": 3, "required": True}], guild_ids = None)
+@client.command(name='p')
+async def p (ctx, name=None, age=None, experience=None, number=''):
+    await ctx.channel.purge(limit = 1)
+    embed= discord.Embed(title = f'<a:emoji_36:937995398444904448>Анкета на пиар-менеджера успешно заполнена {ctx.author}!', description = f'<:emoji_38:937998870594588702> {name}\n<:emoji_38:937998870594588702> {age}\n<:emoji_38:937998870594588702> {experience}\n<:emoji_38:937998870594588702> {number} ', color = 0xff80ff)
+    embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed=embed)
+
+
+@client.event
+async def on_command_error(ctx, error):
+    print(error)
+
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send(f"{ctx.author}, у вас недостаточно прав для выполнения данной команды!")
+
+
+@slash.slash(description = 'присоиденить к голосовому каналу')
+async def join(ctx,):
+    user = ctx.author
+    vc = user.voice.channel
+
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+
+    if voice == None:
+        await vc.connect()
+        await ctx.send( f"Присоиденилась к каналу '**{vc}**' ")
+    else:
+        await ctx.send('войдите в канал')
+
+
+@client.command()
+async def play(ctx, url: str):
+    song_there= os.path.isfile('song.mp3')
+
+    try:
+        if song_there:
+            os.remove('song.mp3')
+            print('[log] Старый файл удален')
+    except PermissionError:
+        print('[log] Не удалось удалить файл' )
+    await ctx.send('Пожалуйста ожидайте')
+
+    voice= get(client.voice_clients, guild= ctx.guild)
+    ydl_opts= {
+        'format' : 'bestaudio/best',
+        'postprocessors': [{
+            'key':'FFmpegExtractAudio',
+            'preferredcodec' : 'mp3',
+            'preferredquality': '192'
+        }]
+    }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        print('[log] Загружаю музыку...')
+        ydl.download([url])
+
+        for file in os.listdir('./'):
+            if file.endswith('.mp3'):
+                name=file
+                print(f'[log]Переименовываю файл: {file}')
+                os.rename(file, 'song.mp3')
+        voice.play(discord.FFmpegPCMAudio('song.mp3'), after= lambda e : print(f'[log] {name},музыка закончила свое проигрование'))
+        voice.source= discord.PCMVolumeTransformer(voice.source)
+        voice.source.volume= 0.07
+
+        song_name= name.rsplit('-',2)
+        await ctx.send(f'Сейчас проигрывает музыка:{song_name[0]}')
+
+
+
+@client.command(name='pause')
+async  def pause (ctx):
+    await ctx.voiсe_client.pause()
+    await ctx.send ("pause")
+
+
+@slash.slash(description = 'отключить от голосового канала')
+async def leave(ctx):
+    global voice
+    voice = discord.utils.get(client.voice_clients, guild = ctx.guild)
+    channel = ctx.author.voice.channel
+
+    if voice and voice.is_connected():
+        await voice.disconnect()
+        await ctx.send(f"Отключилась от голосового канала ")
+    else:
+        voice = await channel.disconnect()
+        await ctx.send(f"Bot was connected to the voice channel")
+
+
+@slash.slash(name = 'ask', description = 'спросить', options = [{"name": "questions", "description": "вопрос","type": 3, "required": True}], guild_ids = None)
+@client.command(name="ask")
+async def ask(ctx,questions=''):
+    ask=['Да', 'Нет', 'Скорее всего да', 'Скорее всего нет', 'Возможно']
+    embed = discord.Embed(title =  f' <:emoji_17:907303747561074779> {questions} ', description =random.choice(ask), color = 0xff80ff)
+    embed.set_footer(text = ctx.author.name, icon_url = ctx.author.avatar_url)
+    await ctx.send(embed= embed)
+
+
+client.run('ODkxNjIzMTg1NzMxMTg2Njg4.YVBCzQ.sTWVc8ee4DpGo1fVrK2bdvlPVeI')
